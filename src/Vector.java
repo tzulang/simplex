@@ -1,3 +1,5 @@
+import java.util.Arrays;
+
 
 /**
  * represent a vector with n elements 
@@ -173,6 +175,27 @@ public class Vector {
 
     	
     }
+
+
+
+	@Override
+	public boolean equals(Object obj) {
+		
+		if (this == obj)
+			return true;
+		
+		if (obj == null)
+			return false;
+		
+		if (getClass() != obj.getClass())
+			return false;
+		
+		Vector other = (Vector) obj;
+		if (!Arrays.equals(elemetns, other.elemetns))
+			return false;
+		
+		return true;
+	}
     
 	
 }
