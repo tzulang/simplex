@@ -47,11 +47,7 @@ public class Vector {
 		
 	}
 	
-	public boolean sizeChek(Vector v){
-		
-		return v.elemetns.length == elemetns.length;
-	}
-	
+ 
 	
     private  void sameSize(Vector v, String op){
 		
@@ -176,7 +172,34 @@ public class Vector {
     	
     }
 
-
+    /*
+     * receives a vector of element indexes, and return a vector with the elements of the original vector which correspond to the given indexes
+     * i.e for vector {11,12,13,14} and  the index vector {1,3} , the function will return {11,13}
+     * throws exception if the size of 'indexes' is greater than this.size() or if an index of 'indexes' is greater than this.size() or have a fraction different than zero
+     */
+    public Vector getElemts(Vector indexes){
+    	
+    	 
+    	if  (indexes.size() > size() )
+			throw new RuntimeException("get element index have to many elements");
+    	
+    	float res[]= new float[indexes.size()];
+    	
+    	for (int i=0; i < indexes.size(); i++ ){
+    		
+    		if  (indexes.elemetns[i] > size() || indexes.elemetns[i]<= 0 )
+    			throw new RuntimeException("element index out of boundaries in get elements");
+    		if  ( (float) Math.floor(indexes.elemetns[i])  != indexes.elemetns[i] )
+    			throw new RuntimeException("element index is not an integer value");
+    		res[i]= elemetns[(int) indexes.elemetns[i] -1] ;
+    		
+    	}
+    	
+		return new Vector(res);
+    	
+    	
+    	
+    }
 
 	@Override
 	public boolean equals(Object obj) {
@@ -197,5 +220,6 @@ public class Vector {
 		return true;
 	}
     
+	
 	
 }

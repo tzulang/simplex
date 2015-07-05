@@ -91,7 +91,17 @@ public class Main {
 		p( Matrix.getIdentity(3));
 		
 		p("");
-		p( m1.transpose());
+		p( m1.transpose().addColumns(3));
+		
+		p("");
+		p( m1.transpose().addColumns( Matrix.getIdentity(3)));
+		
+		
+		float  f5[] ={1,3};
+		Vector ind= new Vector(f5);
+		p("");
+		p(v1);
+		p(v1.getElemts(ind));
 	}
 
 	

@@ -10,7 +10,7 @@ import java.util.Arrays;
 public class Matrix {
 
 	
-	Vector[] rowVec; 
+	private Vector[] rowVec; 
 	
 	
 	
@@ -87,7 +87,7 @@ public class Matrix {
 				throw new RuntimeException("element index out of boundaries");
 			}
 		
-		return rowVec[row].get(col);
+		return rowVec[row-1].get(col);
 	}
 	
 	
@@ -102,7 +102,7 @@ public class Matrix {
 				throw new RuntimeException("element index out of boundaries");
 			}
 		
-		 rowVec[row].set(col, value);
+		 rowVec[row-1].set(col, value);
 	}
 	
  
@@ -116,7 +116,7 @@ public class Matrix {
 	private void checkSize(Matrix m, String op){
 		
 		if (m.rows() != rows() || m.cols() != cols() )
-			throw new RuntimeException(op + " opperation between different size Matrices");
+			throw new RuntimeException(op  + "opperation between different size Matrices");
 	}
 	
 	
@@ -360,7 +360,51 @@ public class Matrix {
 	 }
 
 
- 
+	/*
+	 *  adds numOfcolumns columns of zero at the end of the matrix
+	 */
+	public Matrix addColumns(int numOfcolumns){
+		
+		Matrix m= new Matrix(rows(),cols()+ numOfcolumns);
+		
+		int rows= rows();
+		int cols= cols();
+		for (int r=1 ; r <= rows; r++){
+			for (int c=1; c <= cols; c++){
+				m.set(r,c, get(r,c));
+			}
+		}
+		return m;
+		
+	}
+	
+	public Matrix addColumns(Matrix m){
+		
+		if (m.rows() != rows())
+			throw new RuntimeException(" add columns opperation between different row size Matrices");
+		
+		
+		Matrix res= new Matrix(rows(),cols()+ m.cols());
+		
+		int rows= rows();
+		int cols= cols();
+		for (int r=1 ; r <= rows; r++){
+			for (int c=1; c <= cols; c++){
+				res.set(r,c, get(r,c));
+			}
+		}
+		
+		
+		int cols2= m.cols();
+		for (int r=1 ; r <= rows; r++){
+			for (int c=1; c <= cols2; c++){
+				res.set(r,c+cols(), m.get(r,c));
+			}
+		}
+		return res;
+		
+	}
+  
 	
 	
 	
