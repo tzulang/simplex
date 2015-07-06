@@ -1,3 +1,4 @@
+import java.text.DecimalFormat;
 import java.util.Arrays;
 
 
@@ -240,21 +241,43 @@ public class Vector {
 		return true;
 	}
 
+	
+	
 	public String toString(){
 		
 		StringBuilder s= new StringBuilder("(");
 		int size= elemetns.length;
 		
+	 
+		double val;
 		for (int i=0 ; i<size-1; i++){
-			s.append(elemetns[i]);
+			val = ( Math.abs(elemetns[i])<= Const.EPSILON) ? 0f : elemetns[i];
+					
+			s.append(val);
 			s.append(", ");
 		}
-		s.append(elemetns[size-1]);
+		
+		val = ( Math.abs(elemetns[size-1])<= Const.EPSILON) ? 0f : elemetns[size-1];
+		s.append(val);
 		s.append(")");
 		return s.toString();
 				
 	}
     
-	
+	public static Vector runningNumbersVector(int start , int end){
+		
+		if (start > end)
+			return null;
+		
+		Vector res =new Vector(end-start+1);
+		
+		int val=start;
+		for (int i=0; i<=end-start; i++){
+			res.elemetns[i]= val;
+			val++;
+		}
+		
+		return res;
+	}
 	
 }

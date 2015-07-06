@@ -9,7 +9,7 @@ import java.util.Arrays;
  */
 public class Matrix {
 
-	private static final double EPSILON = 1e-10;
+	
 	private Vector[] rowVec; 
 	
 	
@@ -243,10 +243,10 @@ public class Matrix {
 		
 	 
 		
-		Vector res[]= new Vector[rows()];
+		Vector res[]= new Vector[cols()];
 		
-		int rows= rows();
-		for (int i=0; i< rows; i++){
+		 
+		for (int i=0; i< cols(); i++){
 			
 			res[i]= getColumn(i+1);
 			
@@ -310,7 +310,7 @@ public class Matrix {
 	
 	
 	
-	public Vector getRows(int row){
+	public Vector getRow(int row){
 		
 		if (row <= 0 || row > rowVec.length ){
 			throw new RuntimeException("column index out of boundaries");
@@ -342,24 +342,6 @@ public class Matrix {
 	
 	
 	
-	public  String toString(){
-		
-		StringBuilder s= new StringBuilder("{");
-		int rows= rows();
-		
-		for (int i=0; i< rows-1; i++){
-			
-			s.append(rowVec[i].toString());
-			s.append("\n ");
-			
-		}
-		s.append(rowVec[rows-1].toString()); 
-		s.append(" }");
-		
-		return s.toString();
-	 }
-
-
 	/*
 	 *  adds numOfcolumns columns of zero at the end of the matrix
 	 */
@@ -417,7 +399,7 @@ public class Matrix {
 	public Matrix getColumns(Vector indexes){
     	
    	 
-    	if  (indexes.size() > rows() )
+    	if  (indexes.size() > cols() )
 			throw new RuntimeException("get Columns index have different elements size");
     	
     	int rows= rows();
@@ -430,6 +412,20 @@ public class Matrix {
 		}
 		
 		return new Matrix(res);
+    	    	
+    }
+	
+	
+	
+	
+	public Matrix getRows(Vector indexes){
+    	
+	   	 
+    	if  (indexes.size() > rows() )
+			throw new RuntimeException("get Columns index have different elements size");
+    	
+    	Matrix res =transpose().getColumns(indexes);
+		return res.transpose();
     	    	
     }
 	
@@ -485,8 +481,8 @@ public class Matrix {
     	
     	res= res.rowReduce();
     	
-    	Vector leftIndexes= createMatrixIndexVector(); 
-    	Vector rightIndexes= createInverseMatrixIndexVector(); 
+    	Vector leftIndexes= Vector.runningNumbersVector(1, n); 
+    	Vector rightIndexes= Vector.runningNumbersVector(n+1, 2*n); 
     	
     	Matrix originalRowReduced = res.getColumns(leftIndexes);
     	
@@ -495,34 +491,13 @@ public class Matrix {
     	
     	Matrix inverse = res.getColumns(rightIndexes);
     	
-    	
-    	
 		return inverse;
     		
     }
     
-    private Vector createMatrixIndexVector(){
-    	
-    	double res[]= new double [rows()];
-    		
-    	for (int i=0; i < rows(); i++ ){
-    		res[i]= i+1;
-    	}
-    	
-    	return new Vector(res);
-    }
+   
     
-    private Vector createInverseMatrixIndexVector(){
-	 
-    	double res[]= new double [rows()];
-    		
-    	for (int i=0; i < rows(); i++ ){
-    		res[i]= i+1+rows();
-    	}
-    	
-    	return new Vector(res);
-    }
-	
+ 
     private boolean haveRowOfZeros(){
     	
     	for (int i=0; i < rows(); i++ ){
@@ -567,7 +542,7 @@ public class Matrix {
 		           
 		            
 		            // check if leading element is non zero
-		            if (Math.abs( res.get(r,c)) != 0 ) {
+		            if (Math.abs( res.get(r,c)) > Const.EPSILON ) {
 		                 
 			            // normlize
 			            res.rowVec[r-1]= res.rowVec[r-1].mult( 1/res.get(r, c)  ) ;
@@ -577,8 +552,10 @@ public class Matrix {
 			            		double alpha= res.get(i, c)/ res.get(r, c) ;
 			            		res.rowVec[i-1]= res.rowVec[i-1].sub(  res.rowVec[r-1].mult(alpha) ) ;  //  R[i]= R[i]- alpha * R[r]
 			            	} 
-			            	
 			            }
+			            
+		            } else {
+		            	 res.set(r,c,0);
 		            }
             r++;        
 		    c++;        
@@ -603,6 +580,29 @@ public class Matrix {
 			return false;
 		return true;
 	}
+
+
+
+
+
+
+
+	public  String toString(){
+		
+		StringBuilder s= new StringBuilder("{");
+		int rows= rows();
+		
+		for (int i=0; i< rows-1; i++){
+			
+			s.append(rowVec[i].toString());
+			s.append("\n ");
+			
+		}
+		s.append(rowVec[rows-1].toString()); 
+		s.append(" }");
+		
+		return s.toString();
+	 }
 	
 	
 	
