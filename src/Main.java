@@ -3,9 +3,19 @@ public class Main {
 
 	public static void main(String[] args) {
 
+		test();
+	}
+
+	
+	static void p(Object o){
+		System.out.println(o);
+	}
+	
+	static void test(){
 		
-		float[] f1={1,2,3};
-		float[] f2={4,5,6};
+
+		double[] f1={1,2,3};
+		double[] f2={4,5,6};
 		
 		
 		Vector v1= new Vector(f1);
@@ -34,7 +44,7 @@ public class Main {
 		v3= v1.mult(2);
 		p("v1*2= " + v3);
 		
-		float f= v1.dot(v2);
+		double f= v1.dot(v2);
 		p("v1*v2= " + f);
 		
 		 f= v2.dot(v1);
@@ -52,8 +62,8 @@ public class Main {
 		p("");
 		p("");
 		
-		float[][] f3={{1,2,3},{4,5,6},{7,8,9}};
-		float[][] f4={{5,3,1},{0,8,2},{6,6,-1}};
+		double[][] f3={{1,2,3},{4,5,6},{7,8,9}};
+		double[][] f4={{5,3,1},{0,8,2},{6,6,-1}};
 		
 		Matrix m1 = new Matrix(f3);
 		Matrix m2 = new Matrix(f4);
@@ -97,16 +107,36 @@ public class Main {
 		p( m1.transpose().addColumns( Matrix.getIdentity(3)));
 		
 		
-		float  f5[] ={1,3};
+		double  f5[] ={1,3};
 		Vector ind= new Vector(f5);
 		p("");
 		p(v1);
 		p(v1.getElemts(ind));
-	}
+		
+		
+		double  f6[] ={1,0,1};
+		Vector mask= new Vector(f6);
+		p("");
+		p(v1);
+		p(v1.mask(mask));
+		
+		
+		
+		double[][] f7={{1,2,4},{3,6,12}};
+		m3= new Matrix (f7);
+		
+		p("");
+		p(m3); 
+		p("");
+		p(m3.rowReduce()); 
+		p("");
+		
+		p("");
+		p(m1); 
+		p("");
+		p(m2.inverse().mult(m2)); 
 
-	
-	static void p(Object o){
-		System.out.println(o);
+		
 	}
 }
 

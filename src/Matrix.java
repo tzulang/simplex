@@ -9,7 +9,7 @@ import java.util.Arrays;
  */
 public class Matrix {
 
-	
+	private static final double EPSILON = 1e-10;
 	private Vector[] rowVec; 
 	
 	
@@ -30,7 +30,7 @@ public class Matrix {
 	
 	
 	
-	public  Matrix(float[][] elemnts){
+	public  Matrix(double[][] elemnts){
 					
 		if ( elemnts ==null || elemnts.length <=0 || elemnts[0].length==0)	
 				throw new RuntimeException("zero size matrix");
@@ -81,7 +81,7 @@ public class Matrix {
 	
 	
 	
-	public float get( int row, int col){
+	public double get( int row, int col){
 		
 		if (row <= 0 || row > rowVec.length ){
 				throw new RuntimeException("element index out of boundaries");
@@ -96,7 +96,7 @@ public class Matrix {
 	
 	
 	
-	public void set( int row, int col, float value){
+	public void set( int row, int col, double value){
 		
 		if (row <= 0 || row > rowVec.length ){
 				throw new RuntimeException("element index out of boundaries");
@@ -176,7 +176,7 @@ public class Matrix {
 		
 		checkSize(m, "sub");
 		
-		float res[][]= new float[rows()][cols()];
+		double res[][]= new double[rows()][cols()];
 		
 		int rows= rows();
 		int cols= cols();
@@ -217,7 +217,7 @@ public class Matrix {
     
     
     
-	public Matrix mult( float scalar){
+	public Matrix mult( double scalar){
 		
 		 
 		int rows= rows();
@@ -269,7 +269,7 @@ public class Matrix {
 		 
 		int rows= rows();
 		
-		float res[]= new float[rows];
+		double res[]= new double[rows];
 		
 		for (int r=0; r< rows; r++){
 		 			
@@ -298,7 +298,7 @@ public class Matrix {
 		 
 		int rows= rows();
 		
-		float elemnets[]= new float[rows()];
+		double elemnets[]= new double[rows()];
 		for (int i=0; i< rows ; i++){
 			
 			elemnets[i]= rowVec[i].get(col);
@@ -405,9 +405,191 @@ public class Matrix {
 		
 	}
   
+	 /*
+	 * receives a vector of element of ones and zeros that is used to mask the Matrix rows and remove the 0 masked columns 
+	 * i.e for matrix : {11,12,13}
+	 * 					{14,15,16} 
+	 * and  the indexes vector {1,3} , 
+	 * the function will return {{11,13},
+	 * 							 {14,16}}
+	 * throws exception if the size of 'indexes' is greater than this.rows() or if an index of 'indexes' is greater than this.cols() or have a fraction different than zero
+	 */
+	public Matrix getColumns(Vector indexes){
+    	
+   	 
+    	if  (indexes.size() > rows() )
+			throw new RuntimeException("get Columns index have different elements size");
+    	
+    	int rows= rows();
+    	Vector res[]= new Vector[rows];
+    	
+		 
+		
+		for (int r=0 ; r < rows; r++){		
+			res[r] = rowVec[r].getElemts(indexes);
+		}
+		
+		return new Matrix(res);
+    	    	
+    }
+	
+		
+	 /*
+     * receives a vector of element of ones and zeros that is used to mask the Matrix rows  
+     * i.e for matrix : {11,12}
+     * 					{13,14} 
+     * and  the mask vector {1,0} , 
+     * the function will return {11,0}
+     * 							{13,0}
+     * throws exception if the size of 'mask' is different than this.rows() or if the  elements different than zeros and ones
+     */
+	public Matrix mask(Vector mask){
+    	
+   	 
+    	if  (mask.size() != rows() )
+			throw new RuntimeException("mask index have different elements size");
+    	
+    	double res[][]= new double[rows()][cols()];
+    	
+    	int rows= rows();
+		int cols= cols();
+		
+		for (int c=0; c < cols; c++){	
+			if  ( mask.get(c) != 0  &&  mask.get(c) !=1)
+				throw new RuntimeException("element mask is not 0 or 1");
+		}
+		
+		for (int r=1 ; r <= rows; r++){		
+			for (int c=1; c <= cols; c++){
+								  
+					res[r-1][c-1]= get(r,c) * mask.get(c) ;
+			}
+		}
+	 
+		return new Matrix(res);
+    	    	
+    }
 	
 	
+    public Matrix inverse() 
+    
+    {
+    	
+     
+    	if ( rows() != cols() ){
+    		throw new RuntimeException("inverse of non square Matrix");	
+    	}
+    	int n=rows();
+    	
+    	Matrix res =this.addColumns( Matrix.getIdentity(n) ); // add the identity to the right of the matrix
+    	
+    	res= res.rowReduce();
+    	
+    	Vector leftIndexes= createMatrixIndexVector(); 
+    	Vector rightIndexes= createInverseMatrixIndexVector(); 
+    	
+    	Matrix originalRowReduced = res.getColumns(leftIndexes);
+    	
+    	if (originalRowReduced.haveRowOfZeros())   // the original matrix have a rows of zeros in its canonical form. thus it is singular
+    		throw new RuntimeException("Matrix is singular");	
+    	
+    	Matrix inverse = res.getColumns(rightIndexes);
+    	
+    	
+    	
+		return inverse;
+    		
+    }
+    
+    private Vector createMatrixIndexVector(){
+    	
+    	double res[]= new double [rows()];
+    		
+    	for (int i=0; i < rows(); i++ ){
+    		res[i]= i+1;
+    	}
+    	
+    	return new Vector(res);
+    }
+    
+    private Vector createInverseMatrixIndexVector(){
+	 
+    	double res[]= new double [rows()];
+    		
+    	for (int i=0; i < rows(); i++ ){
+    		res[i]= i+1+rows();
+    	}
+    	
+    	return new Vector(res);
+    }
 	
+    private boolean haveRowOfZeros(){
+    	
+    	for (int i=0; i < rows(); i++ ){
+    		if (rowVec[i].isZero())
+    			return true;
+    	}
+    	
+    	return false;
+    }
+    
+    
+    
+    
+    
+	 // Method to carry out the partial-pivoting Gaussian
+	
+	 public Matrix rowReduce() { 		 
+	 
+	        int rows = rows();
+	        int cols = cols();
+	        
+	        Matrix res= new Matrix(this);
+	        int c= 1;
+	        int r= 1;
+	        
+	    	while( r <= rows && c<=cols ){
+	    		 
+	    			
+		    		int max = r;
+		    		// find pivot row
+		            for (int i = r + 1; i <= rows; i++) {
+		                
+		            	if (Math.abs(res.get(i,c)) > Math.abs(res.get(max,c)) ) {
+		                    max = i;
+		                }
+		            }
+		            //swap
+		            Vector temp = res.rowVec[r-1]; 
+		            res.rowVec[r-1] = res.rowVec[max-1]; 
+		            res.rowVec[max-1] = temp;
+		            
+		           
+		            
+		            // check if leading element is non zero
+		            if (Math.abs( res.get(r,c)) != 0 ) {
+		                 
+			            // normlize
+			            res.rowVec[r-1]= res.rowVec[r-1].mult( 1/res.get(r, c)  ) ;
+			            
+			            for (int i =1; i <= rows; i++) {
+			            	if (i != r){
+			            		double alpha= res.get(i, c)/ res.get(r, c) ;
+			            		res.rowVec[i-1]= res.rowVec[i-1].sub(  res.rowVec[r-1].mult(alpha) ) ;  //  R[i]= R[i]- alpha * R[r]
+			            	} 
+			            	
+			            }
+		            }
+            r++;        
+		    c++;        
+	    	}
+	    	
+	    	
+	    	
+	        return res;
+		 }
+	     
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)

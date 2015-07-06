@@ -9,7 +9,7 @@ public class Vector {
 
 	
 	
-	float elemetns[];
+	private double elemetns[];
 	
 	
 	
@@ -20,7 +20,7 @@ public class Vector {
 		
 		if (size <=0 )
 			throw new RuntimeException("zero size vector");
-		elemetns= new float [size];
+		elemetns= new double [size];
 		
 		for (int i=0 ; i<size; i++){
 			elemetns[i]=0;
@@ -28,7 +28,7 @@ public class Vector {
 		
 	}
 	
-	public Vector (float elemnets[]){
+	public Vector (double elemnets[]){
 		if ( elemnets ==null || elemnets.length <=0 )
 			throw new RuntimeException("zero size vector");
 		elemetns= elemnets;
@@ -39,7 +39,7 @@ public class Vector {
 	public Vector (Vector v){
 		
 		int size=v.elemetns.length;
-		elemetns= new float [size];
+		elemetns= new double [size];
 		
 		for (int i=0 ; i<size; i++){
 			elemetns[i]=v.elemetns[i];
@@ -49,20 +49,25 @@ public class Vector {
 	
  
 	
-    private  void sameSize(Vector v, String op){
+    public int size(){
+		
+		return elemetns.length;
+		
+	}
+
+	private  void sameSize(Vector v, String op){
 		
 		if ( v.elemetns.length != elemetns.length){
 			throw new RuntimeException(op + " opperation between different size vectors");
 		}
 		
 	}
-    
-    
-    public Vector add(Vector v){
+
+	public Vector add(Vector v){
     	
     	sameSize(v, "add");
     	int size=elemetns.length;
-		float res[]= new float [size];
+		double res[]= new double [size];
 		
 		for (int i=0 ; i<size; i++){
 			res[i]= elemetns[i]+v.elemetns[i];
@@ -75,7 +80,7 @@ public class Vector {
     	
     	sameSize(v, "add");
     	int size=elemetns.length;
-		float res[]= new float [size];
+		double res[]= new double [size];
 		
 		for (int i=0 ; i<size; i++){
 			res[i]= elemetns[i]-v.elemetns[i];
@@ -84,11 +89,11 @@ public class Vector {
 		return new Vector(res);
     }
     
-    public Vector mult(float scalar){
+    public Vector mult(double scalar){
     	
     	 
     	int size=elemetns.length;
-		float res[]= new float [size];
+		double res[]= new double [size];
 		
 		for (int i=0 ; i<size; i++){
 			res[i]= elemetns[i] *scalar;
@@ -97,11 +102,11 @@ public class Vector {
 		return new Vector(res);
     }
     
-    public float dot(Vector v){
+    public double dot(Vector v){
     	
     	sameSize(v, "dot product");
     	int size=v.elemetns.length;
-		float res=0;
+		double res=0;
 		
 		for (int i=0 ; i<size; i++){
 			res+= elemetns[i]*v.elemetns[i];
@@ -110,31 +115,7 @@ public class Vector {
 		return res;
     }
     
-    public String toString(){
-    	
-    	StringBuilder s= new StringBuilder("(");
-    	int size= elemetns.length;
-    	
-    	for (int i=0 ; i<size-1; i++){
-			s.append(elemetns[i]);
-			s.append(", ");
-		}
-    	s.append(elemetns[size-1]);
-    	s.append(")");
-    	return s.toString();
-    			
-    }
-    
-    
-    
-    public int size(){
-    	
-    	return elemetns.length;
-    	
-    }
-    
-    
-    public float get( int element){
+    public double get( int element){
     	
     	
     	if (element <= 0 || element > elemetns.length ){
@@ -145,7 +126,7 @@ public class Vector {
     }
     
     
-    public void set( int element, float value){
+    public void set( int element, double value){
     	
     	
     	if (element <= 0 || element > elemetns.length ){
@@ -156,7 +137,7 @@ public class Vector {
     }
     
     
-     public void setAll( int element, float value){
+     public void setAll( int element, double value){
     	
     	
     	if (element <= 0 || element > elemetns.length ){
@@ -183,13 +164,13 @@ public class Vector {
     	if  (indexes.size() > size() )
 			throw new RuntimeException("get element index have to many elements");
     	
-    	float res[]= new float[indexes.size()];
+    	double res[]= new double[indexes.size()];
     	
     	for (int i=0; i < indexes.size(); i++ ){
     		
     		if  (indexes.elemetns[i] > size() || indexes.elemetns[i]<= 0 )
     			throw new RuntimeException("element index out of boundaries in get elements");
-    		if  ( (float) Math.floor(indexes.elemetns[i])  != indexes.elemetns[i] )
+    		if  ( (double) Math.floor(indexes.elemetns[i])  != indexes.elemetns[i] )
     			throw new RuntimeException("element index is not an integer value");
     		res[i]= elemetns[(int) indexes.elemetns[i] -1] ;
     		
@@ -200,6 +181,45 @@ public class Vector {
     	
     	
     }
+    
+    /*
+     * receives a vector of element of ones and zeros that is used to mask the original vector 
+     * i.e for vector {11,12,13,14} and  the mask vector {1,0,1,0} , the function will return {11,0,13,0}
+     * throws exception if the size of 'mask' is different than this.size() or if the  elements different than zeros and ones
+     */
+    public Vector mask(Vector mask){
+    	
+    	 
+    	if  (mask.size() != size() )
+			throw new RuntimeException("mask index have different elements size");
+    	
+    	double res[]= new double[size()];
+    	
+    	for (int i=0; i < size(); i++ ){
+    		
+    		 
+    		if  ( mask.elemetns[i] != 0  && mask.elemetns[i] !=1)
+    			throw new RuntimeException("element mask is not 0 or 1");
+    		
+    		res[i]= elemetns[i] * mask.elemetns[i] ;
+    	}
+    	
+		return new Vector(res);
+    	
+    	
+    	
+    }
+    
+    
+    public boolean isZero(){
+		
+		for (int i=0; i < size(); i++ ){
+			if (elemetns[i]!=0)
+				return false;
+		}
+		return true;
+		
+	}
 
 	@Override
 	public boolean equals(Object obj) {
@@ -218,6 +238,21 @@ public class Vector {
 			return false;
 		
 		return true;
+	}
+
+	public String toString(){
+		
+		StringBuilder s= new StringBuilder("(");
+		int size= elemetns.length;
+		
+		for (int i=0 ; i<size-1; i++){
+			s.append(elemetns[i]);
+			s.append(", ");
+		}
+		s.append(elemetns[size-1]);
+		s.append(")");
+		return s.toString();
+				
 	}
     
 	
