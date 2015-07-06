@@ -10,7 +10,18 @@ public class Main {
 	
 	static void test(){
 		
-
+		Parser parser= new Parser();
+		parser.readFile("./LP.txt");
+		
+		Matrix A= parser.getA();
+		Vector b= parser.getb();
+		Vector c= parser.getc();
+		SimplexTable table= new SimplexTable(A,b,c);
+		
+		double base[]={1,2,3};
+		Vector vb= new Vector(base);
+		table.update(vb);
+		
 		
 		
 	}

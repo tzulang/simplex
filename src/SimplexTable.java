@@ -6,7 +6,7 @@ import java.util.LinkedList;
 public class SimplexTable {
 
 	private Matrix A;
-	private Vector x,b,z;
+	private Vector x,b,c,z;
 	
 	private Matrix Q,
 				   AB,
@@ -17,21 +17,24 @@ public class SimplexTable {
 				   B,
 				   N;
 					
-				   
+	private int m,n;			   
 				   
 	
-	public SimplexTable(Matrix A, Vector b, Vector z){
+	public SimplexTable(Matrix A, Vector b, Vector c){
 		
-		removeDipendetConstraint(A,b, this.A, this.b);
-		this.z=z;
-		
+		if (A.cols()!= b.size())
+			throw new RuntimeException("constraint and Matrix leagel"); 
+		removeDipendetConstraint(A,b);
+		this.c=c;
+		this.m= this.A.rows();
+		this.n= this.b.size();
 	}
 	
 	/*
 	 * if m.rows()> m.cols()  there is dependency between rows so this method use gaussien elimination
 	 * to remove those
 	 */
-	private void removeDipendetConstraint(Matrix m,Vector v, Matrix destenationMatrix , Vector destenationVector){
+	private void removeDipendetConstraint(Matrix m,Vector v){
 		
 		if (m.rows()> m.cols()){
 			
@@ -53,17 +56,15 @@ public class SimplexTable {
 		
 		Vector matrixIndexes= Vector.runningNumbersVector(1, m.cols());
 		
+		A = tmp.getColumns(matrixIndexes);
+		b = tmp.getColumn(m.cols()+1);
 		
-		
-		destenationMatrix = tmp.getColumns(matrixIndexes);
-		destenationVector = tmp.getColumn(m.cols()+1);
-		
-		if ( !validConstarint(destenationMatrix,destenationVector))
+		if ( !validConstarint(m,b))
 				throw new RuntimeException("constraint arent leagel");
 		
 		} else {
-			destenationMatrix = m;
-			destenationVector = b;
+			A = m;
+			b = v;
 		}
 		
 	}
@@ -74,15 +75,50 @@ public class SimplexTable {
 			if (m.getRow(r).isZero() && !b.isZero())   // thers a constarint that is 0*x1 +0*x2+..+0*xn= a where a!=0
 				return false;
 		}
+		
 		return true;
 	}
-
-	private void calcAB(){
-			
-	}
 	
-    private void CalcQ(){
+	
+    public void update(Vector newBasis){
     	 
+    	if (newBasis.size() != m)
+    		throw new RuntimeException("basis != m");
+    	
+    	B = newBasis;
+    	N = getNonbasic(B);
+    	
+    	Main.p(B);
+    	Main.p(N);
+    	
+    	
+    }
+    
+    
+    private Vector getNonbasic(Vector newBasis){
+    	
+    	double res[] =new double[n-m];
+    	
+    	boolean exist[] = new boolean[n];
+    	
+    	for (int i=0; i < n ; i++){
+    		exist[i]=false;
+    	}
+    	
+    	for (int i=1; i <= m ; i++){
+    		exist[(int) (newBasis.get(i)-1)]=true;
+    	}
+    	
+    	int index =0;
+    	for (int i=0; i < n ; i++){
+    		if (!exist[i]) {
+    			res[index]= i;
+    			++index;
+    		}
+    		
+    	}
+		return new Vector(res);
+    	
     }
 	
 	
