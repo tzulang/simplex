@@ -39,7 +39,7 @@ public class Parser {
 			int index=2;
 			
 			double matrix[][]= new double[m][n];
-			double vectorB[] =new double[n];
+			double vectorB[] =new double[m];
 			double vectorC[] =new double[n];
 			
 			for (int r=0; r< m; r++){
@@ -50,12 +50,12 @@ public class Parser {
 			}
 				
 			
-			for (int r=0; r < n; r++){
+			for (int r=0; r < m; r++){
 				vectorB[r]= numList.get(index); 
 				++index;
 			}
 			
-			for (int r=0; r< m; r++){
+			for (int r=0; r< n; r++){
 				vectorC[r]= numList.get(index); 
 				++index;
 			}
@@ -97,7 +97,12 @@ public class Parser {
  
             for (int i= 0; i < parts.length; i++){
             	
+            	try
+            	{
             	numlist.add( Double.parseDouble(parts[i]));
+            	} catch (Exception e){
+            		
+            	}
             }
         }
 		

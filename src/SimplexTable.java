@@ -6,28 +6,33 @@ import java.util.LinkedList;
 public class SimplexTable {
 
 	private Matrix A;
-	private Vector x,b,c,z;
+	private Vector x,b,c;
+	double z;
 	
-	private Matrix Q,
-				   AB,
-				   AN;
-	private Vector p,r,z0, 
+	private Matrix Q, AB,AN;
+	private Vector p,r,
 				   xB,  // vector of basic Variables;
 				   xN,  // vector of non basic Variables;
 				   B,
-				   N;
+				   N,
+				   cB,cN;
+	double z0;
 					
 	private int m,n;			   
-				   
+	
+	 
 	
 	public SimplexTable(Matrix A, Vector b, Vector c){
 		
-		if (A.cols()!= b.size())
-			throw new RuntimeException("constraint and Matrix leagel"); 
+		if (A.rows()!= b.size())
+			throw new RuntimeException("constraint and Matrix ileagel"); 
 		removeDipendetConstraint(A,b);
 		this.c=c;
 		this.m= this.A.rows();
-		this.n= this.b.size();
+		this.n= this.A.cols();
+		
+		this.xN=new Vector(n-m);
+		this.xB=new Vector(m);
 	}
 	
 	/*
@@ -80,7 +85,7 @@ public class SimplexTable {
 	}
 	
 	
-    public void update(Vector newBasis){
+    public void update(Vector newBasis, Vector newBaseValues){
     	 
     	if (newBasis.size() != m)
     		throw new RuntimeException("basis != m");
@@ -88,15 +93,15 @@ public class SimplexTable {
     	B = newBasis;
     	N = getNonbasic(B);
     	
-    	Main.p(B);
-    	Main.p(N);
-    	
-    	
+    	xB= newBaseValues;
+    	  
+    	calc();
     }
     
     
     private Vector getNonbasic(Vector newBasis){
     	
+    			
     	double res[] =new double[n-m];
     	
     	boolean exist[] = new boolean[n];
@@ -112,7 +117,7 @@ public class SimplexTable {
     	int index =0;
     	for (int i=0; i < n ; i++){
     		if (!exist[i]) {
-    			res[index]= i;
+    			res[index]= i+1;
     			++index;
     		}
     		
@@ -121,6 +126,50 @@ public class SimplexTable {
     	
     }
 	
+    private void calc(){
+    	
+    	
+    	
+    	
+    	AB = A.getColumns(B);
+    	AN = A.getColumns(N);
+    	cB = c.getElemts(B);
+    	cN = c.getElemts(N);
+    	
+    	Matrix ABinverse= AB.inverse();
+    	
+    	Q = ABinverse.mult(AN).mult(-1);   // AB^-1 * AN
+    	
+    	Main.p(ABinverse.cols());
+    	Main.p(b);
+    	p = ABinverse.mult(b);
+    	z0 = cB.dot( ABinverse.mult(b));  // z0= cB* AB^-1 * b
+    	
+    	Matrix tmp = (ABinverse.mult(AN)).transpose();
+    	
+    	r= tmp.mult(cB);  // r=  (cB^T * AB^-1 * AN)^T =  (AB^-1*AN)^T * cB  
+    	
+    	z= z0+ r.dot(xN);
+    	
+    	
+//    	Main.p("AB");
+//    	Main.p(AB);
+//    	
+//    	Main.p("AN");
+//    	Main.p(AN);
+//    	
+//    	Main.p("Q");
+//    	Main.p(Q);
+//    	
+//    	Main.p("p");
+//    	Main.p(p);
+//    	
+//    	Main.p("z0");
+//    	Main.p(z0);
+//    	
+//    	Main.p("r");
+//    	Main.p(r);
+    }
 	
 	
 	

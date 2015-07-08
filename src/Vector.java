@@ -19,8 +19,7 @@ public class Vector {
 	
 	public Vector (int size){
 		
-		if (size <=0 )
-			throw new RuntimeException("zero size vector");
+		 
 		elemetns= new double [size];
 		
 		for (int i=0 ; i<size; i++){
@@ -30,8 +29,8 @@ public class Vector {
 	}
 	
 	public Vector (double elemnets[]){
-		if ( elemnets ==null || elemnets.length <=0 )
-			throw new RuntimeException("zero size vector");
+		if ( elemnets ==null)
+			throw new RuntimeException("null vector init");
 		elemetns= elemnets;
 		
 	 
@@ -138,17 +137,11 @@ public class Vector {
     }
     
     
-     public void setAll( int element, double value){
+     public void setAll(double value){
     	
     	
-    	if (element <= 0 || element > elemetns.length ){
-			throw new RuntimeException("element index out of boundaries");
-		}
-    	
-    	int size= elemetns.length;
-    	
-    	for (int i=0 ; i<size-1; i++){
-        	elemetns[element-1]= value;
+     	for (int i=0 ; i<size(); i++){
+        	elemetns[i]= value;
 		}
 
     	

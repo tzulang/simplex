@@ -119,6 +119,11 @@ public class Matrix {
 			throw new RuntimeException(op  + "opperation between different size Matrices");
 	}
 	
+	private void checkMultSize(Matrix m, String op){
+		
+		if ( cols()  != m.rows()  )
+			throw new RuntimeException(op  + "opperation between different size Matrices");
+	}
 	
 	
 	
@@ -174,21 +179,19 @@ public class Matrix {
 
 	public Matrix mult(Matrix m){
 		
-		checkSize(m, "sub");
+		checkMultSize(m, "mult");
 		
-		double res[][]= new double[rows()][cols()];
 		
 		int rows= rows();
-		int cols= cols();
+		int cols= m.cols();
 		
+		double res[][]= new double[rows][cols];
 		
 		for (int r=0; r< rows; r++){
 			for (int c=0; c< cols; c++){
 				
 				res[r][c]=  rowVec[r].dot( m.getColumn(c+1));
 			}
-		
-			
 		}
 		return new Matrix(res);	
 		

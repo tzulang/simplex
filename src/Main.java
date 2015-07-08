@@ -16,9 +16,13 @@ public class Main {
 		Matrix A= parser.getA();
 		Vector b= parser.getb();
 		Vector c= parser.getc();
+		
+		p(A);
+		p(b);
+		p(c);
 		SimplexTable table= new SimplexTable(A,b,c);
 		
-		double base[]={1,2,3};
+		double base[]={1,2};
 		Vector vb= new Vector(base);
 		table.update(vb);
 		
