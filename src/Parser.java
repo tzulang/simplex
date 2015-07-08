@@ -10,7 +10,7 @@ public class Parser {
 	
 	private static final String DELIMITER=" ";
 	private static final char COMMENTER='#';
-	private static final char NEWLINE='\n';
+ 
 	
 	
 	Matrix A;

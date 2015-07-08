@@ -1,4 +1,4 @@
-import java.text.DecimalFormat;
+
 import java.util.Arrays;
 
 
@@ -160,12 +160,15 @@ public class Vector {
     	
     	double res[]= new double[indexes.size()];
     	
+    	Arrays.sort(indexes.elemetns);
+    	
     	for (int i=0; i < indexes.size(); i++ ){
     		
     		if  (indexes.elemetns[i] > size() || indexes.elemetns[i]<= 0 )
     			throw new RuntimeException("element index out of boundaries in get elements");
     		if  ( (double) Math.floor(indexes.elemetns[i])  != indexes.elemetns[i] )
     			throw new RuntimeException("element index is not an integer value");
+    		
     		res[i]= elemetns[(int) indexes.elemetns[i] -1] ;
     		
     	}

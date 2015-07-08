@@ -3,7 +3,15 @@ public class Main {
 
 	public static void main(String[] args) {
 
-		test();
+		double v[]= {11,12,13,14,15};
+		double in[]= {3,1,5};
+		
+		Vector vec= new Vector(v);
+		Vector ind= new Vector(in);
+		
+		p(vec.getElemts(ind));
+		
+		
 	}
 
 	
@@ -17,14 +25,15 @@ public class Main {
 		Vector b= parser.getb();
 		Vector c= parser.getc();
 		
-		p(A);
-		p(b);
-		p(c);
+	 
 		SimplexTable table= new SimplexTable(A,b,c);
 		
 		double base[]={1,2};
-		Vector vb= new Vector(base);
-		table.update(vb);
+		double baseVal[]={0,0};
+		
+		table.update( new Vector(base), new Vector(baseVal));
+		table.printTable();
+		
 		
 		
 		
