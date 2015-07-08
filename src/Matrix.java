@@ -598,11 +598,11 @@ public class Matrix {
 		for (int i=0; i< rows-1; i++){
 			
 			s.append(rowVec[i].toString());
-			s.append("\n ");
+			s.append(",\n ");
 			
 		}
 		s.append(rowVec[rows-1].toString()); 
-		s.append(" }");
+		s.append("}");
 		
 		return s.toString();
 	 }

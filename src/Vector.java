@@ -160,7 +160,7 @@ public class Vector {
     	
     	double res[]= new double[indexes.size()];
     	
-    	Arrays.sort(indexes.elemetns);
+    	
     	
     	for (int i=0; i < indexes.size(); i++ ){
     		
@@ -239,27 +239,6 @@ public class Vector {
 
 	
 	
-	public String toString(){
-		
-		StringBuilder s= new StringBuilder("(");
-		int size= elemetns.length;
-		
-	 
-		double val;
-		for (int i=0 ; i<size-1; i++){
-			val = ( Math.abs(elemetns[i])<= Const.EPSILON) ? 0f : elemetns[i];
-					
-			s.append(val);
-			s.append(", ");
-		}
-		
-		val = ( Math.abs(elemetns[size-1])<= Const.EPSILON) ? 0f : elemetns[size-1];
-		s.append(val);
-		s.append(")");
-		return s.toString();
-				
-	}
-    
 	public static Vector runningNumbersVector(int start , int end){
 		
 		if (start > end)
@@ -274,6 +253,27 @@ public class Vector {
 		}
 		
 		return res;
+	}
+
+	public String toString(){
+		
+		StringBuilder s= new StringBuilder("{");
+		int size= elemetns.length;
+		
+	
+		double val;
+		for (int i=0 ; i<size-1; i++){
+			val = ( Math.abs(elemetns[i])<= Const.EPSILON) ? 0f : elemetns[i];
+					
+			s.append(val);
+			s.append(", ");
+		}
+		
+		val = ( Math.abs(elemetns[size-1])<= Const.EPSILON) ? 0f : elemetns[size-1];
+		s.append(val);
+		s.append("}");
+		return s.toString();
+				
 	}
 	
 }

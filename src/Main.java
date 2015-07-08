@@ -3,14 +3,7 @@ public class Main {
 
 	public static void main(String[] args) {
 
-		double v[]= {11,12,13,14,15};
-		double in[]= {3,1,5};
-		
-		Vector vec= new Vector(v);
-		Vector ind= new Vector(in);
-		
-		p(vec.getElemts(ind));
-		
+		test();
 		
 	}
 
@@ -28,12 +21,22 @@ public class Main {
 	 
 		SimplexTable table= new SimplexTable(A,b,c);
 		
-		double base[]={1,2};
-		double baseVal[]={0,0};
+		double nb[] ={3,4,5};
+		double nbv[] ={1,3,2};
 		
-		table.update( new Vector(base), new Vector(baseVal));
+		Vector newBasis=  new Vector(nb);
+		Vector newBaseValues=  new Vector(nbv);
+		
+//		table.update(newBasis, newBaseValues);
+//		table.printTable();
+		
+		Vector ans=table.solve(); 
+		p("Simplex Table at the End Of the process:");
 		table.printTable();
-		
+		p();
+		p("the answer is x= " + ans + "\n");
+
+		 
 		
 		
 		

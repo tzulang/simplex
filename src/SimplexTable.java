@@ -1,4 +1,4 @@
-import java.lang.reflect.Array;
+ 
 import java.util.LinkedList;
 
 /*
@@ -86,7 +86,7 @@ public class SimplexTable {
 	}
 	
 	
-    public void update(Vector newBasis, Vector newBaseValues){
+	public void update(Vector newBasis){
     	 
     	if (newBasis.size() != m)
     		throw new RuntimeException("basis != m");
@@ -94,9 +94,12 @@ public class SimplexTable {
     	B = newBasis;
     	N = getNonbasic(B);
     	
-    	xB= newBaseValues;
-    	  
+    	 
+    	
+    	
     	calc();
+//    	printTable();
+    	
     }
     
     
@@ -138,9 +141,9 @@ public class SimplexTable {
     	
     	Q = ABinverse.mult(AN).mult(-1);   // AB^-1 * AN
     	
-    	p(ABinverse.cols());
-    	p(b);
+    	 
     	p = ABinverse.mult(b);
+    	xB=p;
     	z0 = cB.dot( ABinverse.mult(b));  // z0= cB* AB^-1 * b
     	
     	Matrix tmp = (ABinverse.mult(AN)).transpose();
@@ -155,7 +158,7 @@ public class SimplexTable {
     
 	private Pivot getPivot(){
 		
-		
+		Pivot pivot= null;
 		boolean found=false;
 		int inIndex = -1;
 		// search for a non negative coefficient of the non basic 
@@ -164,45 +167,50 @@ public class SimplexTable {
 		double minNewValue  = Double.MAX_VALUE;
 		int    outIndex=0;
 		
-		for (int i=1; i< m-n && !found; i++ ){
-						 
+		for (int i=1; i<= n-m ; i++ ){
+				
 			if (r.get(i)<=0)
 				continue;
 			
-			found=true;
-			inIndex = i;
+			
+			
+			inIndex = (int) N.get(i);
 			// search for the most greater change available
 			// for xN_i
-			double delta=0;
+			double delta=-1;
 			
-			for (int j= 1; j< m ; j++){
+			for (int j= 1; j<= m ; j++){
 				// get the coefficient of Qji aka the  coefficient of xN_i at equation j 
-				// in the table			
+				// in the table		
+				 
 				double qi= Q.get(j,i);
 				double pi= p.get(j);
 				
 				if ( qi<0 ){
 					// calculate the max change available
-					double val= (-pi/qi);
-					delta = (val > 0) ? val : 0; 
+					delta= (-pi/qi);
+					 
 				}
 				
-				if ( delta < minNewValue){
+				if ( delta>=0 && delta < minNewValue){
 					minNewValue = delta;
-					outIndex = j;
+					outIndex = (int) B.get(j);
 				}				 
-			} 			
+			}
+			
+			if (minNewValue!=Double.MAX_VALUE && (!found || pivot.newValue < minNewValue )){
+				pivot= new Pivot(inIndex, outIndex, minNewValue);
+				found=true;
+			}
 		}
 		
-		if (!found)
-			return null;   // all non basic coefficients in z are non positive
-				
-		return new Pivot(inIndex, outIndex, minNewValue);
+		 
+		return  pivot;
 		 
 	}
 	
 	
-	private void getInitailBase( Vector base, Vector BaseValue){
+	private void getInitailBase( Vector base){
 		
 		
 		SimplexTable table;
@@ -219,10 +227,10 @@ public class SimplexTable {
 		}
 		
 		Vector newBase= Vector.runningNumbersVector(n+1, n+m);
-		Vector newBaseValues= new Vector(b);
+		 
 		
 		table = new SimplexTable(newA, b, newC);
-		Vector answer = table.solve( newBase, newBaseValues);
+		Vector answer = table.solve(newBase);
 				
 		if (  ! answer.getElemts( Vector.runningNumbersVector(n+1, n+m)).isZero() ){
 			throw new RuntimeException(" no feasable base was found ");
@@ -242,36 +250,41 @@ public class SimplexTable {
 					throw new RuntimeException(" theres an error , to many bases were found ");
 				
 				base.set(counter, i);
-				BaseValue.set(counter, element); 
+//				BaseValue.set(counter, element); 
 					
 			}
 		}
 	}
 	
 	
-	public Vector solve(Vector base, Vector BaseValues){
+	public Vector solve(Vector base){
 		  
-		 update(base, BaseValues);
+		 update(base);
 		 
 		 Pivot pivot= getPivot();
 		 
 		 while ( pivot != null){
 			 
-			 changeBase(base, BaseValues, pivot);
-			 update(base, BaseValues);
+			 changeBase(base, pivot);
+			 update(base);
 			 pivot= getPivot();
 		 }
-		return null;
+		 
+		Vector answer= new Vector(n);
+	    for (int i=1; i<=m; i ++){
+	    	answer.set ( (int) base.get(i), p.get(i) );
+	    }
+		return answer;
 		 	
 	}
 	
-	private void changeBase(Vector base, Vector BaseValues, Pivot pivot){
+	private void changeBase(Vector base,  Pivot pivot){
 		
-		for (int i=0; i< m ; i++){
+		for (int i=1; i <= m ; i++){
 			if (base.get(i) == pivot.outIndex ){
 				
 				base.set(i, pivot.inIndex);
-				BaseValues.set(i, pivot.newValue);
+				 
 				return;
 			}
 			
@@ -290,11 +303,11 @@ public class SimplexTable {
 	public Vector solve(){
 	 
 		 Vector base =new Vector(m);
-		 Vector baseValues =new Vector(m);
 		 
-		 getInitailBase(base, baseValues);
 		 
-		 return solve (base, baseValues);
+		 getInitailBase(base);
+		 
+		 return solve (base);
 	}
 	
 	
@@ -309,7 +322,7 @@ public class SimplexTable {
 	
 	
     public void printTable(){
-	
+    	p("");
 		p("A=");
 	  	p(A);
 	  	
@@ -321,11 +334,9 @@ public class SimplexTable {
 	  	
 	  	
 	  	if (B != null ){
-		  	p("Basis=");
+		  	p("Base=");
 		  	p(B);
-		  	p("Basis values=");
-		  	p(xB);
-		  	
+		   
 		  	p("AB=");
 		  	p(AB);
 		  	
@@ -363,5 +374,9 @@ class Pivot{
 		this.outIndex= outIndex;
 		this.inIndex = inIndex;
 		this.newValue= newValue;
+	}
+	
+	public String toString(){
+		return ("{ in: "+ inIndex + ", out: " +outIndex +", new Value: " + newValue +" }");
 	}
 }
