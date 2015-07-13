@@ -533,7 +533,7 @@ public class Matrix {
 		    		// find pivot row
 		            for (int i = r + 1; i <= rows; i++) {
 		                
-		            	if (Math.abs(res.get(i,c)) > Math.abs(res.get(max,c)) ) {
+		            	if (Math.abs(res.get(i,c)) >= Math.abs(res.get(max,c)) ) {
 		                    max = i;
 		                }
 		            }
@@ -558,7 +558,9 @@ public class Matrix {
 			            }
 			            
 		            } else {
-		            	 res.set(r,c,0);
+//		            	 for (int i=1 ; i<= rows; i++){
+		            		 res.set(r,c,0);
+		            	 }
 		            }
             r++;        
 		    c++;        
@@ -607,7 +609,17 @@ public class Matrix {
 		return s.toString();
 	 }
 	
-	
+	 public Matrix round(){
+		 
+		 int rows= rows();
+	    Vector res[]= new Vector[rows];
+	    		
+		for (int r=0 ; r < rows; r++){		
+			res[r] = rowVec[r].round();
+		}
+			
+		return new Matrix(res);
+	 }
 	
 	
 }

@@ -6,26 +6,26 @@ import java.util.LinkedList;
 
 
 
-public class Parser {
+public class CouplingParser {
 	
 	private static final String DELIMITER=" ";
 	private static final char COMMENTER='#';
  
 	
 	
-	Matrix A;
-	Vector b,c;
+	 
+	private Vector p,q;
 	
-	public Parser(){ 
-		A= null; 
-		b= null;
+	public CouplingParser(){ 
+		q= null; 
+		p= null;
 	}
 	
-	public void readFile(String fileName){
+	public void parseCouplingFile(String fileName) throws Exception  {
 		int m,n;
 		FileReader fileReader;
 		BufferedReader bufferedReader = null;
-		try {
+		 
 			
 			fileReader = new FileReader(fileName);
 			bufferedReader = new BufferedReader(fileReader);
@@ -33,56 +33,44 @@ public class Parser {
 			
 			LinkedList<Double> numList=getNumberBuffer(fileReader, bufferedReader);
 			
-			m =numList.get(0).intValue();
-			n =numList.get(1).intValue();
+			 
+			n =numList.get(0).intValue();
 			
-			int index=2;
+			int index=1;
 			
-			double matrix[][]= new double[m][n];
-			double vectorB[] =new double[m];
-			double vectorC[] =new double[n];
+			 
+			double vectorQ[] =new double[n];
+			double vectorP[] =new double[n];
 			
-			for (int r=0; r< m; r++){
-				for (int c=0; c< n; c++){
-					matrix[r][c]= numList.get(index);
-					++index;
-				}
-			}
-				
+		 
 			
-			for (int r=0; r < m; r++){
-				vectorB[r]= numList.get(index); 
+			for (int r=0; r < n; r++){
+				vectorP[r]= numList.get(index); 
 				++index;
 			}
 			
 			for (int r=0; r< n; r++){
-				vectorC[r]= numList.get(index); 
+				vectorQ[r]= numList.get(index); 
 				++index;
 			}
 			
-			A= new Matrix(matrix);
-			b= new Vector(vectorB);
-			c= new Vector(vectorC);
+		 
+			q= new Vector(vectorQ);
+			p= new Vector(vectorP);
 				
 			bufferedReader.close();
 			fileReader.close();
-		} catch (Exception e) {
-			
-			e.printStackTrace();
-		}  
+	  
 		
 	}
 	
-	public Matrix getA(){
-		return A;
+	public Vector get_q(){
+		return q;
 	}
-	public Vector getb(){
-		return b;
+	public Vector get_p(){
+		return p;
 	}
-	public Vector getc(){
-		return c;
-	}
-	
+ 
 	private LinkedList<Double> getNumberBuffer(FileReader fileReader,BufferedReader bufferedReader) throws IOException{
 		
 		String line;
@@ -92,14 +80,15 @@ public class Parser {
             
             String[] parts = line.split(DELIMITER);
              
-            if (parts ==null  || parts.length==0 || parts[0].length()==0 || parts[0].charAt(0)== COMMENTER)
+            if (parts ==null  || parts.length==0 || parts[0].charAt(0)== COMMENTER)
             	continue;
  
             for (int i= 0; i < parts.length; i++){
             	
             	try
             	{
-            	numlist.add( Double.parseDouble(parts[i]));
+            	if (parts[i].length()!=0)
+            		numlist.add( Double.parseDouble(parts[i]));
             	} catch (Exception e){
             		
             	}

@@ -211,7 +211,7 @@ public class Vector {
     public boolean isZero(){
 		
 		for (int i=0; i < size(); i++ ){
-			if (elemetns[i]!=0)
+			if (Math.abs(elemetns[i])> Const.EPSILON)
 				return false;
 		}
 		return true;
@@ -276,4 +276,48 @@ public class Vector {
 				
 	}
 	
+	public Vector addElements(int size){
+			
+		double res [] = new double [size()+size];
+		for (int i=0; i<size();  i++){
+			res[i]=elemetns[i];
+		}
+		for( int i =size(); i<size()+size; i++){
+			res[i]=0;
+		}
+		return new Vector(res);
+		
+	}
+	public Vector sortElements(){
+		Vector res= new Vector(this);
+		
+		Arrays.sort(res.elemetns);
+		return res;
+	}
+	
+	public boolean contains(double val){
+		int s=size();
+		for( int i =0; i < s; i++){
+			 if ( elemetns[i] == val)
+				 return true;
+		}
+		return false;
+	}
+	
+	public int indexOf(double val){
+		int s=size();
+		for( int i =0; i < s; i++){
+			 if ( elemetns[i] == val)
+				 return i+1;
+		}
+		return -1;
+	}
+	
+	public Vector round(){
+		double res[] = new double[size()];
+		for( int i =0; i < size(); i++){
+			res[i]= Const.round(elemetns[i]);
+		}
+		return new Vector (res);
+	}
 }

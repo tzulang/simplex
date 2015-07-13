@@ -1,39 +1,60 @@
  
 import java.util.LinkedList;
 
+ 
+
 /*
  * represent a simplex Table of an LP with equalities constraint only Ax=b x>=0
  */
 public class SimplexTable {
-
+	
+	public static enum MODE{ EQUALITY, INEQUALITY};
+	
 	private Matrix A;
 	private Vector b,c;
 	private double z;
 	
 	private Matrix Q, AB,AN;
 	private Vector p,r,
-				   xB,  // vector of basic Variables;
+				  
 				   xN,  // vector of non basic Variables;
 				   B,
 				   N,
 				   cB,cN;
 	private double z0;
 					
-	private int m,n;			   
+	private int m,n, originalNumOfVar;			   
 	
 	 
-	
-	public SimplexTable(Matrix A, Vector b, Vector c){
+    public double getMaxValue(){
+    	return z;
+    }
+	public Vector cutAnswerToOriginalVariables(Vector answer){
+
+		 	Vector originalIndexes= Vector.runningNumbersVector(1, originalNumOfVar);
+		 	return answer.getElemts(originalIndexes);
+	}
+	public SimplexTable(Matrix A, Vector b, Vector c, MODE mode){
 		
 		if (A.rows()!= b.size())
 			throw new RuntimeException("constraint and Matrix ileagel"); 
+		
+		this.m= A.rows();
+		originalNumOfVar= A.cols();
+		if (mode == MODE.INEQUALITY){
+			
+			A=A.addColumns(Matrix.getIdentity(m));
+			c=c.addElements(m);
+		}
 		removeDipendetConstraint(A,b);
 		this.c=c;
-		this.m= this.A.rows();
+	
 		this.n= this.A.cols();
 		
 		this.xN=new Vector(n-m);
-		this.xB=new Vector(m);
+		 
+		
+		
 	}
 	
 	/*
@@ -42,25 +63,26 @@ public class SimplexTable {
 	 */
 	private void removeDipendetConstraint(Matrix m,Vector v){
 		
-		if (m.rows()> m.cols()){
+//		if (m.rows()> m.cols()){
 			
 		
 		Vector vec[] ={v};
-		Matrix tmp= m.addColumns( new Matrix(vec) );
+		Matrix tmp2= m.addColumns( new Matrix(vec).transpose() );
 		
-		tmp= tmp.rowReduce();
+		Matrix tmp= tmp2.rowReduce();
 		
 		LinkedList<Vector> nonZeroVec= new LinkedList<Vector>(); 
 		
 		for (int r=1; r<=tmp.rows() ; r++){
 			
-			Vector row= m.getRow(r);
+			Vector row= tmp.getRow(r);
 			if (!row.isZero()){
 				nonZeroVec.add(row);
 			}
 		}
-		
-		Vector matrixIndexes= Vector.runningNumbersVector(1, m.cols());
+		Vector newRows[] =new Vector[nonZeroVec.size()];
+		tmp = new Matrix(newRows);
+		Vector matrixIndexes= Vector.runningNumbersVector(1, tmp.cols());
 		
 		A = tmp.getColumns(matrixIndexes);
 		b = tmp.getColumn(m.cols()+1);
@@ -68,10 +90,10 @@ public class SimplexTable {
 		if ( !validConstraint(m,b))
 				throw new RuntimeException("constraint arent leagel");
 		
-		} else {
-			A = m;
-			b = v;
-		}
+//		} else {
+//			A = m;
+//			b = v;
+//		}
 		
 	}
 	
@@ -131,7 +153,10 @@ public class SimplexTable {
     }
 	
     private void calc(){
-    		
+    	
+    	B= B.sortElements();
+    	N= N.sortElements();
+    	
     	AB = A.getColumns(B);
     	AN = A.getColumns(N);
     	cB = c.getElemts(B);
@@ -143,7 +168,7 @@ public class SimplexTable {
     	
     	 
     	p = ABinverse.mult(b);
-    	xB=p;
+    	 
     	z0 = cB.dot( ABinverse.mult(b));  // z0= cB* AB^-1 * b
     	
     	Matrix tmp = (ABinverse.mult(AN)).transpose();
@@ -192,7 +217,9 @@ public class SimplexTable {
 					 
 				}
 				
-				if ( delta>=0 && delta < minNewValue){
+				 
+				
+				if ( delta>= 0 && delta < minNewValue){
 					minNewValue = delta;
 					outIndex = (int) B.get(j);
 				}				 
@@ -201,7 +228,8 @@ public class SimplexTable {
 			if (minNewValue!=Double.MAX_VALUE && (!found || pivot.newValue < minNewValue )){
 				pivot= new Pivot(inIndex, outIndex, minNewValue);
 				found=true;
-			}
+			} 
+			
 		}
 		
 		 
@@ -229,31 +257,55 @@ public class SimplexTable {
 		Vector newBase= Vector.runningNumbersVector(n+1, n+m);
 		 
 		
-		table = new SimplexTable(newA, b, newC);
+		table = new SimplexTable(newA, b, newC, MODE.EQUALITY);
 		Vector answer = table.solve(newBase);
-				
+		answer = answer.round();
 		if (  ! answer.getElemts( Vector.runningNumbersVector(n+1, n+m)).isZero() ){
 			throw new RuntimeException(" no feasable base was found ");
-		} 
+		}
 		
-		int counter =0;
+		
+		for (int i= n+1 ; i <= n+m; i++){
+			if (table.B.contains(i)  ){
 				
-		for (int i=1; i <n; i++){
-			
-			double element = answer.get(i);
-			
-			if (element > 0 ){
-				
-				counter++;
-				
-				if (counter> m)
-					throw new RuntimeException(" theres an error , to many bases were found ");
-				
-				base.set(counter, i);
-//				BaseValue.set(counter, element); 
+				int indexB= table.B.indexOf(i);
+				boolean found=false;
+				for (int j= 1 ; j < table.N.size() && !found ; j++){
 					
+					int baseIn=(int) table.N.get(j);
+					if (baseIn<= n){
+						 found=true;
+						 table.B.set(indexB, baseIn);
+						 table.N.set(j, i);
+					}
+				}
 			}
 		}
+		
+		for (int i=1; i <= m; i++){
+			if (table.B.get(i)> n)
+				throw new RuntimeException(" no feasable base was found ");
+		}
+//		int counter =0;
+		
+		for (int i=1; i <=m; i++){
+			
+			base.set(i,table.B.get(i));	
+		}
+//			
+//			double element = answer.get(i);		
+//			if (element > 0 ){
+//				
+//				counter++;
+//				
+//				if (counter> m)
+//					throw new RuntimeException(" theres an error , to many bases were found ");
+//				
+//				base.set(counter, i);
+////				BaseValue.set(counter, element); 
+//					
+//			}
+//		}
 	}
 	
 	
@@ -274,6 +326,8 @@ public class SimplexTable {
 	    for (int i=1; i<=m; i ++){
 	    	answer.set ( (int) base.get(i), p.get(i) );
 	    }
+	    
+	    
 		return answer;
 		 	
 	}
@@ -296,7 +350,7 @@ public class SimplexTable {
 	}
 			
 
-	
+	 
 	
 	
 	

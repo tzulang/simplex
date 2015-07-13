@@ -1,2 +1,8 @@
-/IndexValue.class
-/Pivot.class
+/GeneralSimplexSolver.class
+/Q2.class
+/Q3.class
+/Coupling.class
+/Coordinate.class
+/SimplexParser.class
+/CoupelingParser.class
+/CouplingParser.class
